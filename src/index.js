@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 
 const typeDefs = `
   type User {
+    id: ID!
     email: String!
     name: String
   }
@@ -18,11 +19,18 @@ const typeDefs = `
 
   type Mutation {
     createUser(data: CreateUserInput!): User!
+    updateUser(id: ID!, data: UpdateUserInput!): User!
+    deleteUser(id: ID!): User!
   }
 
   input CreateUserInput {
     email: String!
     name: String!
+  }
+
+  input UpdateUserInput {
+    email: String
+    name: String
   }
 `;
 
@@ -46,6 +54,26 @@ const resolvers = {
         data: {
           email: data.email,
           name: data.name,
+        },
+      });
+    },
+    updateUser: (parent, args, ctx, info) => {
+      const { id, data } = args;
+      return prisma.user.update({
+        where: {
+          id: Number(id),
+        },
+        data: {
+          email: data.email,
+          name: data.name,
+        },
+      });
+    },
+    deleteUser: (parent, args, ctx, info) => {
+      const { id } = args;
+      return prisma.user.delete({
+        where: {
+          id: Number(id),
         },
       });
     },
