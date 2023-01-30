@@ -1,104 +1,24 @@
-# Type definitions (schema) - 3 types : Query, Mutation, Subscription
-# ======================  Queries  ======================
-type Query {
-  user: User!
-  post: Post!
-  users(query: String): [User!]!
-  posts(query: String): [Post!]!
-  comments: [Comment!]!
-}
-
 type User {
-  id: ID!
-  name: String!
+  id: String!
   email: String!
-  age: Int
-  posts: [Post!]!
-  comments: [Comment!]!
+  name: String
 }
-
-type Post {
-  id: ID!
-  title: String!
-  body: String!
-  published: Boolean!
-  author: User!
-  comments: [Comment!]!
+type Query {
+  allUsers: [User!]!
+  user(id: String!): User!
 }
-
-type Comment {
-  id: ID!
-  text: String!
-  author: User!
-  post: Post!
-}
-
-# ======================  Mutations  ======================
 type Mutation {
   createUser(data: CreateUserInput!): User!
-  deleteUser(id: ID!): User!
-  updateUser(id: ID!, data: UpdateUserInput!): User!
-  createPost(data: CreatePostInput!): Post!
-  deletePost(id: ID!): Post!
-  updatePost(id: ID!, data: UpdatePostInput!): Post!
-  createComment(data: CreateCommentInput!): Comment!
-  deleteComment(id: ID!): Comment!
-  updateComment(id: ID!, data: UpdateCommentInput!): Comment!
+  updateUser(data: UpdateUserInput!): User!
+  deleteUser(id: String!): User!
 }
-
 input CreateUserInput {
-  name: String!
   email: String!
-  age: Int
+  name: String!
 }
 
 input UpdateUserInput {
-  name: String
-  email: String
-  age: Int
-}
-
-input CreatePostInput {
-  title: String!
-  body: String!
-  published: Boolean!
-  author: ID!
-}
-
-input UpdatePostInput {
-  title: String
-  body: String
-  published: Boolean
-}
-
-input CreateCommentInput {
-  text: String!
-  author: ID!
-  postId: ID!
-}
-
-input UpdateCommentInput {
-  text: String
-}
-
-# ======================  Subscriptions  ======================
-type Subscription {
-  post: PostSubscriptionPayload!
-  comment(postId: ID!): CommentSubscriptionPayload!
-}
-
-type PostSubscriptionPayload {
-  mutation: MutationType!
-  data: Post!
-}
-
-type CommentSubscriptionPayload {
-  mutation: MutationType!
-  data: Comment!
-}
-
-enum MutationType {
-  CREATED
-  UPDATED
-  DELETED
+  id: String!
+  email: String!
+  name: String!
 }

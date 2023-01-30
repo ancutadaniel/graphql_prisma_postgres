@@ -1,83 +1,17 @@
-import { PrismaClient } from '@prisma/client';
+import cors from 'cors';
 import express from 'express';
+import { readFile } from 'fs/promises';
 import { graphqlHTTP } from 'express-graphql';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 
-const prisma = new PrismaClient();
+import Query from './resolvers/Query.js';
+import Mutation from './resolvers/Mutation.js';
 
-const typeDefs = `
-  type User {
-    id: ID!
-    email: String!
-    name: String
-  }
-
-  type Query {
-    allUsers: [User!]!
-    user: User!
-  }
-
-  type Mutation {
-    createUser(data: CreateUserInput!): User!
-    updateUser(id: ID!, data: UpdateUserInput!): User!
-    deleteUser(id: ID!): User!
-  }
-
-  input CreateUserInput {
-    email: String!
-    name: String!
-  }
-
-  input UpdateUserInput {
-    email: String
-    name: String
-  }
-`;
+const typeDefs = await readFile('src/schema.graphql', 'utf8');
 
 const resolvers = {
-  Query: {
-    allUsers: () => {
-      return prisma.user.findMany();
-    },
-    user: () => {
-      return prisma.user.findUnique({
-        where: {
-          id: 1,
-        },
-      });
-    },
-  },
-  Mutation: {
-    createUser: (parent, args, ctx, info) => {
-      const { data } = args;
-      return prisma.user.create({
-        data: {
-          email: data.email,
-          name: data.name,
-        },
-      });
-    },
-    updateUser: (parent, args, ctx, info) => {
-      const { id, data } = args;
-      return prisma.user.update({
-        where: {
-          id: Number(id),
-        },
-        data: {
-          email: data.email,
-          name: data.name,
-        },
-      });
-    },
-    deleteUser: (parent, args, ctx, info) => {
-      const { id } = args;
-      return prisma.user.delete({
-        where: {
-          id: Number(id),
-        },
-      });
-    },
-  },
+  Query,
+  Mutation,
 };
 
 export const schema = makeExecutableSchema({
@@ -86,11 +20,13 @@ export const schema = makeExecutableSchema({
 });
 
 const app = express();
+
 app.use(
   '/graphql',
   graphqlHTTP({
     schema,
-  })
+  }),
+  cors()
 );
 
 app.listen(4000, () => {
