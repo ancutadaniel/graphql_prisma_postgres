@@ -9,8 +9,57 @@ const Query = {
       where: {
         id: args.id,
       },
+      include: {
+        posts: true,
+        comments: true,
+      },
     }),
-  allUsers: () => prisma.user.findMany(),
+
+  post: (parent, args, ctc, info) =>
+    prisma.post.findUnique({
+      where: {
+        id: args.id,
+      },
+      include: {
+        author: true,
+        comments: true,
+      },
+    }),
+
+  comment: (parent, args, ctc, info) =>
+    prisma.comment.findUnique({
+      where: {
+        id: args.id,
+      },
+      include: {
+        author: true,
+        post: true,
+      },
+    }),
+
+  allUsers: () =>
+    prisma.user.findMany({
+      include: {
+        posts: true,
+        comments: true,
+      },
+    }),
+
+  allPosts: () =>
+    prisma.post.findMany({
+      include: {
+        author: true,
+        comments: true,
+      },
+    }),
+
+  allComments: () =>
+    prisma.comment.findMany({
+      include: {
+        author: true,
+        post: true,
+      },
+    }),
 };
 
 export default Query;
