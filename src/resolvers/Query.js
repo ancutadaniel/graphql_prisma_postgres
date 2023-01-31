@@ -1,54 +1,65 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
 const Query = {
   // parent, args, ctx, info - arguments that are passed to the resolver function
-  user: (parent, args, ctx, info) => {
-    return {
-      id: '123',
-      name: 'Daniel',
-      email: '',
-      age: 30,
-    };
-  },
+  user: (parent, args, ctc, info) =>
+    prisma.user.findUnique({
+      where: {
+        id: args.id,
+      },
+      include: {
+        posts: true,
+        comments: true,
+      },
+    }),
 
-  post: (parent, args, ctx, info) => {
-    return {
-      id: '123',
-      title: 'GraphQL 101',
-      body: 'This is my first post',
-      published: false,
-    };
-  },
+  post: (parent, args, ctc, info) =>
+    prisma.post.findUnique({
+      where: {
+        id: args.id,
+      },
+      include: {
+        author: true,
+        comments: true,
+      },
+    }),
 
-  users: (parent, args, { db }, info) => {
-    const { query } = args;
-    if (!query) return db.users;
-    return db.users.filter((user) =>
-      user.name.toLowerCase().includes(query.toLowerCase())
-    );
-  },
+  comment: (parent, args, ctc, info) =>
+    prisma.comment.findUnique({
+      where: {
+        id: args.id,
+      },
+      include: {
+        author: true,
+        post: true,
+      },
+    }),
 
-  posts: (parent, args, { db }, info) => {
-    const { query } = args;
+  allUsers: () =>
+    prisma.user.findMany({
+      include: {
+        posts: true,
+        comments: true,
+      },
+    }),
 
-    if (!query) return db.posts;
+  allPosts: () =>
+    prisma.post.findMany({
+      include: {
+        author: true,
+        comments: true,
+      },
+    }),
 
-    return db.posts.filter((post) => {
-      const isTitleMatch = post.title
-        .toLowerCase()
-        .includes(query.toLowerCase());
-      const isBodyMatch = post.body.toLowerCase().includes(query.toLowerCase());
-      return isTitleMatch || isBodyMatch;
-    });
-  },
-
-  comments: (parent, args, { db }, info) => {
-    const { query } = args;
-
-    if (!query) return db.comments;
-
-    return db.comments.filter((comment) =>
-      comment.text.toLowerCase().includes(query.toLowerCase())
-    );
-  },
+  allComments: () =>
+    prisma.comment.findMany({
+      include: {
+        author: true,
+        post: true,
+      },
+    }),
 };
 
 export default Query;

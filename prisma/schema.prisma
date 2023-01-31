@@ -12,7 +12,34 @@ datasource db {
 
 
 model User {
-  id      Int      @id @default(autoincrement())
+  id      String   @id @default(uuid()) 
   email   String   @unique
   name    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts   Post[]
+  comments Comment[]
+}
+
+model Post {
+  id        String   @id @unique @default(uuid()) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  body      String?
+  published Boolean  @default(false)
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  String  
+  comments  Comment[]
+}
+
+model Comment {
+  id        String   @id @default(uuid()) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  text      String
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  String  
+  post      Post    @relation(fields: [postId], references: [id])
+  postId    String  
 }
