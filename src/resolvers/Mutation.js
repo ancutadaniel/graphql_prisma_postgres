@@ -23,8 +23,43 @@ const Mutation = {
       },
     });
   },
-  deleteUser: (parent, args, ctx, info) => {
+  deleteUser: async (parent, args, ctx, info) => {
     const { id } = args;
+
+    // Delete the user's associated posts
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: id,
+      },
+    });
+    // postIds is an array of post ids that we want to delete
+    const postIds = posts.map((post) => post.id);
+    await prisma.post.deleteMany({
+      where: {
+        id: {
+          in: postIds,
+        },
+      },
+    });
+
+    // Delete the user's associated comments
+    const comments = await prisma.comment.findMany({
+      where: {
+        authorId: id,
+      },
+    });
+
+    // commentIds is an array of comment ids that we want to delete
+    const commentIds = comments.map((comment) => comment.id);
+    await prisma.comment.deleteMany({
+      where: {
+        id: {
+          in: commentIds,
+        },
+      },
+    });
+
+    // Delete the user
     return prisma.user.delete({
       where: {
         id,

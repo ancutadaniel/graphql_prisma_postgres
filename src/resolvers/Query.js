@@ -43,6 +43,9 @@ const Query = {
         posts: true,
         comments: true,
       },
+      orderBy: {
+        name: 'asc',
+      },
     }),
 
   allPosts: () =>
@@ -50,6 +53,9 @@ const Query = {
       include: {
         author: true,
         comments: true,
+      },
+      orderBy: {
+        updatedAt: 'desc',
       },
     }),
 

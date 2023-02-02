@@ -10,36 +10,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id      String   @id @default(uuid()) 
-  email   String   @unique
-  name    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  posts   Post[]
-  comments Comment[]
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  posts     Post[]
+  comments  Comment[]
 }
 
 model Post {
-  id        String   @id @unique @default(uuid()) 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @unique @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   title     String
   body      String?
-  published Boolean  @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  String  
+  published Boolean   @default(false)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
   comments  Comment[]
 }
 
 model Comment {
-  id        String   @id @default(uuid()) 
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   text      String
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  String  
-  post      Post    @relation(fields: [postId], references: [id])
-  postId    String  
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
 }
